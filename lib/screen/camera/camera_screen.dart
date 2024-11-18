@@ -12,19 +12,20 @@ class CameraScreen extends StatefulWidget {
 class _CameraScreenState extends State<CameraScreen> {
   late CameraController _cameraController;
   late List<CameraDescription> _cameras;
-  late Future<void> _initializeControllerFuture;
+  Future<void>? _initializeControllerFuture;
 
   Future<void> initCamera() async {
     _cameras = await availableCameras();
     _cameraController = CameraController(_cameras.first, ResolutionPreset.max);
     _initializeControllerFuture = _cameraController.initialize();
-    setState(() {});
+    setState(
+        () {}); // Memperbarui UI setelah _initializeControllerFuture diatur
   }
 
   @override
   void initState() {
-    initCamera();
     super.initState();
+    initCamera();
   }
 
   @override
@@ -39,25 +40,32 @@ class _CameraScreenState extends State<CameraScreen> {
       appBar: AppBar(
         title: const Text('Take a picture'),
       ),
-      body: FutureBuilder(
-          future: _initializeControllerFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              return CameraPreview(_cameraController);
-            } else {
-              return const Center(child: CircularProgressIndicator());
-            }
-          }),
+      body: _initializeControllerFuture == null
+          ? const Center(child: CircularProgressIndicator())
+          : FutureBuilder(
+              future: _initializeControllerFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return CameraPreview(_cameraController);
+                } else {
+                  return const Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
+          if (_initializeControllerFuture == null) return;
+
           try {
-            // Ensure that the camera is initialized.
+            // Pastikan kamera sudah diinisialisasi
             await _initializeControllerFuture;
 
+            // Ambil gambar
             final image = await _cameraController.takePicture();
 
             if (!context.mounted) return;
 
+            // Navigasi ke layar tampilan gambar
             await Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) =>
