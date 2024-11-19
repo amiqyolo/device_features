@@ -1,7 +1,6 @@
 import 'package:device_features/screen/camera/camera_screen.dart';
+import 'package:device_features/screen/device/device_info_screen.dart';
 import 'package:device_features/screen/flashlight/flashlight_screen.dart';
-import 'package:device_features/screen/processor/processor_screen.dart';
-import 'package:device_features/screen/ram/ram_screen.dart';
 import 'package:device_features/screen/sensor/sensor_screen.dart';
 import 'package:device_features/screen/touchscreen/touch_screen.dart';
 import 'package:device_features/widget/feature_button.dart';
@@ -92,17 +91,10 @@ class MyHomePage extends StatelessWidget {
                 ),
               ),
               FeatureButton(
-                label: 'Access Processor Info',
+                label: 'Access Device Info',
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const ProcessorScreen()),
-                ),
-              ),
-              FeatureButton(
-                label: 'Access RAM Info',
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const RamScreen()),
+                  MaterialPageRoute(builder: (_) => const DeviceInfoScreen()),
                 ),
               ),
             ],
