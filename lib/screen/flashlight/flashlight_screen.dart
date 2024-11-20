@@ -13,19 +13,25 @@ class FlashlightScreen extends StatefulWidget {
 class _FlashlightScreenState extends State<FlashlightScreen> {
   static const platform = MethodChannel('com.aplimelta.flashlight/channel');
   bool isFlashOn = false;
+  String _statusMessage = "Press the button to toggle flashlight";
 
-  Future<void> toggleFlashLight() async {
+  Future<void> _toggleFlashLight() async {
     try {
-      final bool result = await platform.invokeMethod(
+      final bool newStatus = !isFlashOn;
+      final dynamic result = await platform.invokeMethod(
         'toggleFlashLight',
-        {'status': !isFlashOn},
+        {'status': newStatus},
       );
 
       setState(() {
-        isFlashOn = result;
+        isFlashOn = newStatus;
+        _statusMessage = result;
       });
     } on PlatformException catch (e) {
-      dev.log('Error: ${e.message}');
+      dev.log('Error Flash Light: ${e.message}');
+      setState(() {
+        _statusMessage = "Error: ${e.toString()}";
+      });
     }
   }
 
@@ -37,12 +43,13 @@ class _FlashlightScreenState extends State<FlashlightScreen> {
         child: Column(
           children: [
             Text(
-              'Flashlight is ${isFlashOn ? "ON" : "OFF"}',
-              style: TextStyle(fontSize: 20),
+              _statusMessage,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 20),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: toggleFlashLight,
+              onPressed: _toggleFlashLight,
               child: Text(isFlashOn ? 'Turn OFF' : 'Turn ON'),
             ),
           ],

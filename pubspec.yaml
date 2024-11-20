@@ -42,7 +42,7 @@ dependencies:
   cached_network_image: ^3.4.1
   device_info_plus: ^11.1.1
   system_info2: ^4.0.0
-#  system_info_plus: ^0.0.5
+  torch_light: ^1.1.0
 
 dev_dependencies:
   flutter_test:

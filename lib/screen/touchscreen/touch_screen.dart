@@ -60,9 +60,24 @@ class _TouchScreenState extends State<TouchScreen> {
           });
         },
         child: Listener(
-          onPointerDown: _handleTouch,
-          onPointerUp: _handleTouch,
-          onPointerMove: _handleTouch,
+          onPointerDown: (event) {
+            _handleTouch(event);
+            setState(() {
+              touchInfo = "Pointer Down!";
+            });
+          },
+          onPointerUp: (event) {
+            _handleTouch(event);
+            setState(() {
+              touchInfo = "Pointer Up!";
+            });
+          },
+          onPointerMove: (event) {
+            _handleTouch(event);
+            setState(() {
+              touchInfo = "Pointer Move!";
+            });
+          },
           child: Container(
             color: Colors.blue.shade50,
             child: Center(
