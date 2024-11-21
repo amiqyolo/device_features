@@ -44,7 +44,7 @@ class TouchTrackerPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = Colors.blue // warna line
-      ..strokeWidth = 4.0 // Ketebalan jalur
+      ..strokeWidth = 24.0 // Ketebalan jalur
       ..strokeCap = StrokeCap.round;
 
     for (int i = 0; i < points.length - 1; i++) {
