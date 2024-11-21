@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_barometer/flutter_barometer.dart';
+import 'package:sensors_plus/sensors_plus.dart';
 
 class BarometerScreen extends StatefulWidget {
   const BarometerScreen({super.key});
@@ -20,12 +20,12 @@ class _BarometerScreenState extends State<BarometerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Barometer Data')),
-      body: StreamBuilder<FlutterBarometerEvent>(
-        stream: flutterBarometerEvents,
+      body: StreamBuilder<BarometerEvent>(
+        stream: barometerEventStream(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) return const CircularProgressIndicator();
 
-          final FlutterBarometerEvent event = snapshot.data!;
+          final BarometerEvent event = snapshot.data!;
           return Center(
             child: Text(
               'Barometer Field\nPressure: ${event.pressure.toStringAsFixed(2)} hPa',
