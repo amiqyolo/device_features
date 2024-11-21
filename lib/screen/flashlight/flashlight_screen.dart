@@ -1,59 +1,35 @@
-import 'dart:developer' as dev;
+import 'package:device_features/screen/flashlight/flashlight_channel_screen.dart';
+import 'package:device_features/screen/flashlight/flashlight_torch_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
-class FlashlightScreen extends StatefulWidget {
+import '../../widget/feature_button.dart';
+
+class FlashlightScreen extends StatelessWidget {
   const FlashlightScreen({super.key});
-
-  @override
-  State<FlashlightScreen> createState() => _FlashlightScreenState();
-}
-
-// USING platform channels to communicate between native dart with native android & ios.
-class _FlashlightScreenState extends State<FlashlightScreen> {
-  static const platform = MethodChannel('com.aplimelta.flashlight/channel');
-  bool isFlashOn = false;
-  String _statusMessage = "Press the button to toggle flashlight";
-
-  Future<void> _toggleFlashLight() async {
-    try {
-      final bool newStatus = !isFlashOn;
-      final dynamic result = await platform.invokeMethod(
-        'toggleFlashLight',
-        {'status': newStatus},
-      );
-
-      setState(() {
-        isFlashOn = newStatus;
-        _statusMessage = result;
-      });
-    } on PlatformException catch (e) {
-      dev.log('Error Flash Light: ${e.message}');
-      setState(() {
-        _statusMessage = "Error: ${e.toString()}";
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Center(
-        child: Column(
-          children: [
-            Text(
-              _statusMessage,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 20),
+      body: ListView(
+        children: [
+          FeatureButton(
+            label: 'Flash Light Torch Controller',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const FlashlightTorchController()),
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _toggleFlashLight,
-              child: Text(isFlashOn ? 'Turn OFF' : 'Turn ON'),
+          ),
+          FeatureButton(
+            label: 'Flash Light Channel',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const FlashlightChannelScreen()),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

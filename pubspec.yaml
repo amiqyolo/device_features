@@ -43,6 +43,7 @@ dependencies:
   device_info_plus: ^11.1.1
   system_info2: ^4.0.0
   torch_light: ^1.1.0
+  flutter_barometer: ^0.1.0
 
 dev_dependencies:
   flutter_test:

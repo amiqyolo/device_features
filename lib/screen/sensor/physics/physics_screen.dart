@@ -4,7 +4,7 @@ import 'package:device_features/screen/sensor/physics/gyroscope_screen.dart';
 import 'package:device_features/screen/sensor/physics/magnetometer_screen.dart';
 import 'package:flutter/material.dart';
 
-import '../../widget/feature_button.dart';
+import '../../../widget/feature_button.dart';
 
 class PhysicsScreen extends StatelessWidget {
   const PhysicsScreen({super.key});

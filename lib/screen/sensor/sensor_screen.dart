@@ -3,9 +3,9 @@ import 'dart:developer';
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:device_features/screen/sensor/behavior_screen.dart';
-import 'package:device_features/screen/sensor/biometrics_screen.dart';
-import 'package:device_features/screen/sensor/physics_screen.dart';
+import 'package:device_features/screen/sensor/behavior/behavior_screen.dart';
+import 'package:device_features/screen/sensor/biometrics/biometrics_screen.dart';
+import 'package:device_features/screen/sensor/physics/physics_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
