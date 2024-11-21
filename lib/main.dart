@@ -1,9 +1,8 @@
 import 'package:device_features/screen/camera/camera_screen.dart';
 import 'package:device_features/screen/device/device_info_screen.dart';
-import 'package:device_features/screen/flashlight/flashlight_screen.dart';
 import 'package:device_features/screen/flashlight/flashlight_torch_controller.dart';
 import 'package:device_features/screen/sensor/sensor_screen.dart';
-import 'package:device_features/screen/touchscreen/touch_screen.dart';
+import 'package:device_features/screen/touchscreen/touch_tracker_screen.dart';
 import 'package:device_features/widget/feature_button.dart';
 import 'package:flutter/material.dart';
 
@@ -81,14 +80,15 @@ class MyHomePage extends StatelessWidget {
                 label: 'Touch Screen',
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const TouchScreen()),
+                  MaterialPageRoute(builder: (_) => const TouchTrackerScreen()),
                 ),
               ),
               FeatureButton(
                 label: 'Access Flashlight',
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const FlashlightTorchController()),
+                  MaterialPageRoute(
+                      builder: (_) => const FlashlightTorchController()),
                 ),
               ),
               FeatureButton(
