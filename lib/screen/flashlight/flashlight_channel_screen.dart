@@ -1,4 +1,3 @@
-import 'dart:developer' as dev;
 import 'package:device_features/app_consts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,19 +6,22 @@ class FlashlightChannelScreen extends StatefulWidget {
   const FlashlightChannelScreen({super.key});
 
   @override
-  State<FlashlightChannelScreen> createState() => _FlashlightChannelScreenState();
+  State<FlashlightChannelScreen> createState() =>
+      _FlashlightChannelScreenState();
 }
 
 // USING platform channels to communicate between native dart with native android & ios.
 class _FlashlightChannelScreenState extends State<FlashlightChannelScreen> {
-  static const MethodChannel _channel = MethodChannel(AppConsts.flashChannelName);
+  static const MethodChannel _channel =
+      MethodChannel(AppConsts.flashChannelName);
   bool isFlashOn = false;
   bool _isTorchAvailable = false;
   String _statusMessage = "Checking torch availability...";
 
   Future<void> _torchAvailable() async {
     try {
-      final bool result = await _channel.invokeMethod(AppConsts.nativeEventIsTorchAvailable) as bool;
+      final bool result = await _channel
+          .invokeMethod(AppConsts.nativeEventIsTorchAvailable) as bool;
       setState(() {
         _isTorchAvailable = result;
         _statusMessage = result
