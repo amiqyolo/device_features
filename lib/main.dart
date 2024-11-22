@@ -1,4 +1,5 @@
 import 'package:device_features/screen/camera/camera_screen.dart';
+import 'package:device_features/screen/device/device_file.dart';
 import 'package:device_features/screen/device/device_info_screen.dart';
 import 'package:device_features/screen/flashlight/flashlight_screen.dart';
 import 'package:device_features/screen/flashlight/flashlight_torch_controller.dart';
@@ -97,7 +98,7 @@ class MyHomePage extends StatelessWidget {
                 label: 'Access Device Info',
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const DeviceInfoScreen()),
+                  MaterialPageRoute(builder: (_) => const DeviceFile()),
                 ),
               ),
             ],
