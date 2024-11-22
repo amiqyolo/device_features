@@ -75,7 +75,13 @@ class _DeviceFileState extends State<DeviceFile> {
                   final totalRAM = snapshot.data ?? 0;
                   final ramInGB = (totalRAM / (1024 * 1024 * 1024)).toStringAsFixed(2);
         
-                  return Text('Total RAM: $ramInGB GB');
+                  return Column(
+                    children: [
+                      Text('Total RAM: $ramInGB GB'),
+                      Text('Free RAM: $ramInGB GB'),
+                      Text('Available RAM: $ramInGB GB'),
+                    ],
+                  );
                 },
               ),
             ],
