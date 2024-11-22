@@ -27,4 +27,37 @@ class Utils {
     }
     return 0;
   }
+
+  static Future<Map<String, List<Map<String, String>>>> getCpuInfoMultiCore() async {
+    final cpuInfo = await File('/proc/cpuinfo').readAsString();
+    final lines = cpuInfo.split('\n');
+
+    List<Map<String, String>> coreDetails = [];
+    Map<String, String> currentCore = {};
+
+    for (var line in lines) {
+      if (line.trim().isEmpty) {
+        if (currentCore.isNotEmpty) {
+          coreDetails.add(Map.from(currentCore));
+          currentCore.clear();
+        }
+      } else if (line.contains(':')) {
+        final parts = line.split(':');
+        currentCore[parts[0].trim()] = parts[1].trim();
+      }
+    }
+
+    // Pastikan core terakhir dimasukkan
+    if (currentCore.isNotEmpty) {
+      coreDetails.add(currentCore);
+    }
+
+    // Grupkan informasi berdasarkan core (berdasarkan key "processor")
+    final Map<String, List<Map<String, String>>> coreGroupedInfo = {};
+    for (int i = 0; i < coreDetails.length; i++) {
+      coreGroupedInfo['Core $i'] = [coreDetails[i]];
+    }
+
+    return coreGroupedInfo;
+  }
 }
