@@ -1,6 +1,7 @@
 package com.aplimelta.device_features
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.hardware.Camera
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraCharacteristics
@@ -12,9 +13,11 @@ import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
+@RequiresApi(Build.VERSION_CODES.M)
 class MainActivity : FlutterActivity() {
 
-    private var legacyCamera: Camera? = null
+    private lateinit var cameraManager: CameraManager
+    private var cameraId: String? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -23,86 +26,110 @@ class MainActivity : FlutterActivity() {
             flutterEngine.dartExecutor.binaryMessenger,
             CHANNEL
         ).setMethodCallHandler { call, result ->
-            if (call.method == "toggleFlashLight") {
-                val status = call.argument<Boolean>("Status") ?: false
-                toggleFlashlight(status, result)
-            } else {
-                result.notImplemented()
+            val status = call.argument<Boolean>("Status") ?: false
+            when (call.method) {
+                NATIVE_EVENT_TORCH_AVAILABLE -> isTorchAvailable(result)
+                NATIVE_EVENT_ENABLE_TORCH -> enableTorch(result)
+                NATIVE_EVENT_DISABLE_TORCH -> disableTorch(result)
+                else -> result.notImplemented()
             }
         }
     }
 
-    private fun toggleFlashlight(status: Boolean, result: MethodChannel.Result) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            useCamera2API(status, result)
-        } else {
-            useLegacyCameraAPI(status, result)
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.M)
-    private fun useCamera2API(status: Boolean, result: MethodChannel.Result) {
-        val cameraManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
-        val cameraId = cameraManager.cameraIdList.find { id ->
-            val characteristics = cameraManager.getCameraCharacteristics(id)
-            val hasFlash = characteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE) ?: false
-            hasFlash
-        }
-
+    private fun disableTorch(result: MethodChannel.Result) {
         if (cameraId != null) {
             try {
-                cameraManager.setTorchMode(cameraId, status)
-                Log.d("Flashlight", "Torch mode set to $status for Camera2 API")
-                result.success("Flashlight toggled: $status")
+                cameraManager.setTorchMode(cameraId!!, false)
+                result.success("Flashlight toggled: false")
             } catch (e: CameraAccessException) {
-                Log.e("Flashlight", "Failed to access camera: ${e.message}")
-                result.error("CAMERA_ACCESS_ERROR", "Failed to access camera: ${e.message}", null)
+                result.error(
+                    ERROR_DISABLE_TORCH_EXISTENT_USER,
+                    "There is an existent camera user, cannot disable torch: $e", null
+                )
             } catch (e: Exception) {
-                Log.e("Flashlight", "Unexpected error: ${e.message}")
-                result.error("FLASHLIGHT_ERROR", "Failed to toggle flashlight: ${e.message}", null)
+                result.error(
+                    ERROR_DISABLE_TORCH,
+                    "Could not disable torch", null
+                )
             }
         } else {
-            Log.e("Flashlight", "No camera with flash found on this device")
-            result.error("NO_FLASH", "No flashlight found on this device", null)
+            result.error(
+                ERROR_DISABLE_TORCH_NOT_AVAILABLE,
+                "Torch is not available", null
+            )
         }
     }
 
-    private fun useLegacyCameraAPI(status: Boolean, result: MethodChannel.Result) {
-        try {
-            if (legacyCamera == null) {
-                legacyCamera = Camera.open() // Buka kamera default
+    private fun enableTorch(result: MethodChannel.Result) {
+        if (cameraId != null) {
+            try {
+                cameraManager.setTorchMode(cameraId!!, true)
+                result.success("Flashlight toggled: true")
+            } catch (e: CameraAccessException) {
+                result.error(
+                    ERROR_ENABLE_TORCH_EXISTENT_USER,
+                    "There is an existent camera user, cannot enable torch: $e", null
+                )
+            } catch (e: Exception) {
+                result.error(
+                    ERROR_ENABLE_TORCH,
+                    "Could not enable torch: $e", null
+                )
             }
-
-            val params = legacyCamera?.parameters
-            if (status) {
-                params?.flashMode = Camera.Parameters.FLASH_MODE_TORCH
-            } else {
-                params?.flashMode = Camera.Parameters.FLASH_MODE_OFF
-            }
-            legacyCamera?.parameters = params
-
-            if (!status) {
-                legacyCamera?.release() // Lepaskan kamera jika dimatikan
-                legacyCamera = null
-            }
-
-            Log.d("Flashlight", "Flashlight toggled to $status for Camera API 1")
-            result.success("Flashlight toggled: $status")
-        } catch (e: Exception) {
-            Log.e("Flashlight", "Failed to toggle flashlight: ${e.message}")
-            result.error("LEGACY_CAMERA_ERROR", "Failed to toggle flashlight: ${e.message}", null)
+        } else {
+            result.error(
+                ERROR_ENABLE_TORCH_NOT_AVAILABLE,
+                "Torch is not available", null
+            )
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        // Pastikan kamera dilepaskan jika aplikasi ditutup
-        legacyCamera?.release()
-        legacyCamera = null
+    private fun isTorchAvailable(result: MethodChannel.Result) {
+        result.success(context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH))
     }
 
+//    private fun toggleFlashlight(status: Boolean, result: MethodChannel.Result) {
+//        val cameraManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
+//
+//        try {
+//            cameraId = cameraManager.cameraIdList[0]
+//        } catch (e: Exception) {
+//            Log.d(TAG, "Could not fetch camera id, the plugin won't work.")
+//        }
+//
+//        if (cameraId != null) {
+//            try {
+//                cameraManager.setTorchMode(cameraId!!, status)
+//                Log.d("Flashlight", "Torch mode set to $status for Camera2 API")
+//                result.success("Flashlight toggled: $status")
+//            } catch (e: CameraAccessException) {
+//                Log.e("Flashlight", "Failed to access camera: ${e.message}")
+//                result.error("CAMERA_ACCESS_ERROR", "Failed to access camera: ${e.message}", null)
+//            } catch (e: Exception) {
+//                Log.e("Flashlight", "Unexpected error: ${e.message}")
+//                result.error("FLASHLIGHT_ERROR", "Failed to toggle flashlight: ${e.message}", null)
+//            }
+//        } else {
+//            Log.e("Flashlight", "No camera with flash found on this device")
+//            result.error("NO_FLASH", "No flashlight found on this device", null)
+//        }
+//    }
 
     companion object {
-        private const val CHANNEL = "com.aplimelta.flashlight/channel"
+        private val TAG = MainActivity::class.java.simpleName
+
+        private const val CHANNEL = "com.aplimelta.flashlight/main"
+
+        private const val NATIVE_EVENT_TORCH_AVAILABLE = "torch_available"
+
+        private const val NATIVE_EVENT_ENABLE_TORCH = "enable_torch"
+        private const val ERROR_ENABLE_TORCH_EXISTENT_USER = "enable_torch_error_existent_user"
+        private const val ERROR_ENABLE_TORCH = "enable_torch_error"
+        private const val ERROR_ENABLE_TORCH_NOT_AVAILABLE = "enable_torch_not_available"
+
+        private const val NATIVE_EVENT_DISABLE_TORCH = "disable_torch"
+        private const val ERROR_DISABLE_TORCH_EXISTENT_USER = "disable_torch_error_existent_user"
+        private const val ERROR_DISABLE_TORCH = "disable_torch_error"
+        private const val ERROR_DISABLE_TORCH_NOT_AVAILABLE = "disable_torch_not_available"
     }
 }

@@ -41,10 +41,10 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
         final cores = SysInfo.cores;
         print('Number of core    : ${cores.length}');
         for (final core in cores) {
-          print('  Architecture          : ${core.architecture}');
-          print('  Name                  : ${core.name}');
-          print('  Socket                : ${core.socket}');
-          print('  Vendor                : ${core.vendor}');
+          print('Architecture          : ${core.architecture}');
+          print('Name                  : ${core.name}');
+          print('Socket                : ${core.socket}');
+          print('Vendor                : ${core.vendor}');
         }
         print('Total physical memory   '
             ': ${SysInfo.getTotalPhysicalMemory() ~/ megaByte} MB');
@@ -127,6 +127,7 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
 
     setState(() {
       deviceInfo = info;
+      print(deviceInfo); // Debug: Check the structure of deviceInfo
     });
   }
 
@@ -150,9 +151,12 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
       body: deviceInfo.isEmpty
           ? const Center(child: CircularProgressIndicator())
           : ListView(
+        shrinkWrap: true,
               children: deviceInfo.entries.map((entry) {
                 final value = entry.value;
-                if (value is Map<String, dynamic>) {
+                print('Processing entry: ${entry.key}'); // Debug
+                print('Value: $value'); // Debug
+                if (value is Map<String, dynamic> && value.isNotEmpty) {
                   return ExpansionTile(
                     title: Text(entry.key),
                     children: value.entries.map((subEntry) {
@@ -162,10 +166,17 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
                       );
                     }).toList(),
                   );
-                } else {
+                } else if (value != null) {
+                  // Handle non-map entries
                   return ListTile(
                     title: Text(entry.key),
                     subtitle: Text(value.toString()),
+                  );
+                } else {
+                  // Handle unexpected null or empty cases
+                  return ListTile(
+                    title: Text(entry.key),
+                    subtitle: const Text('No data available'),
                   );
                 }
               }).toList(),

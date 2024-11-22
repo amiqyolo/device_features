@@ -1,3 +1,4 @@
+import 'package:device_features/screen/sensor/biometrics/finger_print_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../../widget/feature_button.dart';
@@ -15,7 +16,7 @@ class BiometricsScreen extends StatelessWidget {
             label: 'Fingerprint Sensor',
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const BiometricsScreen()),
+              MaterialPageRoute(builder: (_) => const FingerPrintScreen()),
             ),
           ),
           FeatureButton(
