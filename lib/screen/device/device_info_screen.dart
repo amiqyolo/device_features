@@ -72,7 +72,7 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
           },
           'Hardware': {
             'Processor':
-                androidDeviceInfo.supportedAbis.firstOrNull ?? 'Unknown',
+                androidDeviceInfo.supportedAbis ?? 'Unknown',
             'Total Physical Memory': '$deviceMemory MB',
             // 'Free Physical Memory': '${SysInfo.getFreePhysicalMemory() ~/ (1024 * 1024)} MB',
             // 'Total Virtual Memory': '${SysInfo.getTotalVirtualMemory() ~/ (1024 * 1024)} MB',
