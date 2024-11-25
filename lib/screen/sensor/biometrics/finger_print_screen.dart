@@ -6,32 +6,29 @@ class FingerPrintScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final LocalAuthentication auth = LocalAuthentication();
+    final LocalAuthentication localAuth = LocalAuthentication();
 
-    Future<bool> _authenticate() async {
+    Future<void> authenticateWithFingerprint() async {
       try {
-        return await auth.authenticate(
-          localizedReason: 'Authenticate to access this feature',
-          options: const AuthenticationOptions(biometricOnly: true),
-        );
+        final isAuthenticated = await localAuth.authenticate(
+            localizedReason: 'Authenticate to access secure features');
+        final message = isAuthenticated
+            ? "Authentication Successful"
+            : "Authentication Failed";
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(message)));
       } catch (e) {
-        return false;
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Error: $e")));
       }
     }
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(title: const Text('Fingerprint Authentication')),
       body: Center(
         child: ElevatedButton(
-          onPressed: () async {
-            bool isAuthenticated = await _authenticate();
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(isAuthenticated
-                  ? 'Authentication Successful'
-                  : 'Authentication Failed'),
-            ));
-          },
-          child: const Text('Authenticate'),
+          onPressed: authenticateWithFingerprint,
+          child: const Text("Authenticate with Fingerprint"),
         ),
       ),
     );

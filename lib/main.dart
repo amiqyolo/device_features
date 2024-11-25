@@ -6,6 +6,9 @@ import 'package:device_features/screen/flashlight/flashlight_torch_controller.da
 import 'package:device_features/screen/sensor/sensor_screen.dart';
 import 'package:device_features/screen/touchscreen/touch_screen.dart';
 import 'package:device_features/screen/touchscreen/touch_tracker_screen.dart';
+import 'package:device_features/screen/vibration/vibration_screen.dart';
+import 'package:device_features/screen/volume/volume_screen.dart';
+import 'package:device_features/screen/wifi/wifi_connectivity_screen.dart';
 import 'package:device_features/widget/feature_button.dart';
 import 'package:flutter/material.dart';
 
@@ -99,6 +102,27 @@ class MyHomePage extends StatelessWidget {
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const DeviceFile()),
+                ),
+              ),
+              FeatureButton(
+                label: 'Access Volume',
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const VolumeScreen()),
+                ),
+              ),
+              FeatureButton(
+                label: 'Access Vibration',
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const VibrationScreen()),
+                ),
+              ),
+              FeatureButton(
+                label: 'Access WI-FI Connectivity',
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const WifiConnectivityScreen()),
                 ),
               ),
             ],

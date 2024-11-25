@@ -44,6 +44,9 @@ dependencies:
   system_info2: ^4.0.0
   torch_light: ^1.1.0
   local_auth: ^2.3.0
+  volume_controller: ^2.0.8
+  vibration: ^2.0.1
+  connectivity_plus: ^6.1.0
 
 dev_dependencies:
   flutter_test:
