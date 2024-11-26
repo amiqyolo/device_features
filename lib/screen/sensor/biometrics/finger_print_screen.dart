@@ -1,34 +1,106 @@
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
 
-class FingerPrintScreen extends StatelessWidget {
+class FingerPrintScreen extends StatefulWidget {
   const FingerPrintScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final LocalAuthentication localAuth = LocalAuthentication();
+  State<FingerPrintScreen> createState() => _FingerPrintScreenState();
+}
 
-    Future<void> authenticateWithFingerprint() async {
-      try {
-        final isAuthenticated = await localAuth.authenticate(
-            localizedReason: 'Authenticate to access secure features');
-        final message = isAuthenticated
-            ? "Authentication Successful"
-            : "Authentication Failed";
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(message)));
-      } catch (e) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("Error: $e")));
-      }
+class _FingerPrintScreenState extends State<FingerPrintScreen> {
+  final LocalAuthentication _auth = LocalAuthentication();
+  bool? _canCheckBiometrics;
+  String _authMessage = 'Press the button to authenticate';
+
+  @override
+  void initState() {
+    super.initState();
+    _checkBiometricSupport();
+  }
+
+  Future<void> _checkBiometricSupport() async {
+    try {
+      final canCheck = await _auth.canCheckBiometrics;
+      final isDeviceSupported = await _auth.isDeviceSupported();
+
+      setState(() {
+        _canCheckBiometrics = canCheck && isDeviceSupported;
+      });
+    } catch (e) {
+      setState(() {
+        _authMessage = 'Error checking biometric support: $e';
+      });
     }
+  }
 
+  Future<void> _authenticate() async {
+    try {
+      setState(() {
+        _authMessage = 'Authenticating...';
+      });
+
+      final authenticated = await _auth.authenticate(
+        localizedReason: 'Authenticate to access secure features',
+        options: const AuthenticationOptions(
+          biometricOnly: true,
+          stickyAuth: true,
+        ),
+      );
+
+      setState(() {
+        _authMessage = authenticated
+            ? 'Authentication Successful'
+            : 'Authentication Failed';
+      });
+    } catch (e) {
+      setState(() {
+        _authMessage = 'Authentication Error: $e';
+      });
+    }
+  }
+
+  Future<void> authenticateWithFingerprint() async {
+    try {
+      final isAuthenticated = await _auth.authenticate(
+          localizedReason: 'Authenticate to access secure features');
+      final message = isAuthenticated
+          ? "Authentication Successful"
+          : "Authentication Failed";
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Error: $e")));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Fingerprint Authentication')),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: authenticateWithFingerprint,
-          child: const Text("Authenticate with Fingerprint"),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            if (_canCheckBiometrics == false)
+              const Text(
+                'Device does not support fingerprint authentication.',
+                style: TextStyle(color: Colors.red),
+              ),
+            ElevatedButton(
+              onPressed:
+              _canCheckBiometrics == true ? _authenticate : null,
+              child: const Text('Authenticate with Fingerprint'),
+            ),
+            const SizedBox(height: 16.0),
+            Text(
+              _authMessage,
+              style: const TextStyle(fontSize: 16.0),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
       ),
     );

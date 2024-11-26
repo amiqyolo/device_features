@@ -1,20 +1,17 @@
 package com.aplimelta.device_features
 
-import android.content.Context
 import android.content.pm.PackageManager
-import android.hardware.Camera
 import android.hardware.camera2.CameraAccessException
-import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 @RequiresApi(Build.VERSION_CODES.M)
-class MainActivity : FlutterActivity() {
+class MainActivity : FlutterFragmentActivity() {
 
     private lateinit var cameraManager: CameraManager
     private var cameraId: String? = null
@@ -28,20 +25,20 @@ class MainActivity : FlutterActivity() {
         ).setMethodCallHandler { call, result ->
             val status = call.argument<Boolean>("Status") ?: false
             Log.i(TAG, "SERIAL: " + Build.SERIAL);
-            Log.i(TAG,"MODEL: " + Build.MODEL);
-            Log.i(TAG,"ID: " + Build.ID);
-            Log.i(TAG,"Manufacture: " + Build.MANUFACTURER);
-            Log.i(TAG,"brand: " + Build.BRAND);
-            Log.i(TAG,"type: " + Build.TYPE);
-            Log.i(TAG,"user: " + Build.USER);
-            Log.i(TAG,"BASE: " + Build.VERSION_CODES.BASE);
-            Log.i(TAG,"INCREMENTAL " + Build.VERSION.INCREMENTAL);
-            Log.i(TAG,"SDK  " + Build.VERSION.SDK);
-            Log.i(TAG,"BOARD: " + Build.BOARD);
-            Log.i(TAG,"BRAND " + Build.BRAND);
-            Log.i(TAG,"HOST " + Build.HOST);
-            Log.i(TAG,"FINGERPRINT: "+Build.FINGERPRINT);
-            Log.i(TAG,"Version Code: " + Build.VERSION.RELEASE);
+            Log.i(TAG, "MODEL: " + Build.MODEL);
+            Log.i(TAG, "ID: " + Build.ID);
+            Log.i(TAG, "Manufacture: " + Build.MANUFACTURER);
+            Log.i(TAG, "brand: " + Build.BRAND);
+            Log.i(TAG, "type: " + Build.TYPE);
+            Log.i(TAG, "user: " + Build.USER);
+            Log.i(TAG, "BASE: " + Build.VERSION_CODES.BASE);
+            Log.i(TAG, "INCREMENTAL " + Build.VERSION.INCREMENTAL);
+            Log.i(TAG, "SDK  " + Build.VERSION.SDK);
+            Log.i(TAG, "BOARD: " + Build.BOARD);
+            Log.i(TAG, "BRAND " + Build.BRAND);
+            Log.i(TAG, "HOST " + Build.HOST);
+            Log.i(TAG, "FINGERPRINT: " + Build.FINGERPRINT);
+            Log.i(TAG, "Version Code: " + Build.VERSION.RELEASE);
             when (call.method) {
                 NATIVE_EVENT_TORCH_AVAILABLE -> isTorchAvailable(result)
                 NATIVE_EVENT_ENABLE_TORCH -> enableTorch(result)
@@ -100,7 +97,7 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun isTorchAvailable(result: MethodChannel.Result) {
-        result.success(context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH))
+        result.success(applicationContext.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH))
     }
 
 //    private fun toggleFlashlight(status: Boolean, result: MethodChannel.Result) {
