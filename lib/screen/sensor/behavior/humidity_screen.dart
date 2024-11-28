@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../widget/feature_button.dart';
-
 class HumidityScreen extends StatefulWidget {
   const HumidityScreen({super.key});
 
@@ -10,33 +8,53 @@ class HumidityScreen extends StatefulWidget {
 }
 
 class _HumidityScreenState extends State<HumidityScreen> {
+  // Environment not support
+  // final environmentSensors = EnvironmentSensors();
   double? _humidity;
+  bool _isSensorAvailable = false;
 
   @override
   void initState() {
     super.initState();
 
-    // Sensors_plus tidak memiliki sensor suhu & kelembapan, simulasi nilai.
-    Future.delayed(const Duration(seconds: 1), () {
+    _checkSensors();
+  }
+
+  Future<void> _checkSensors() async {
+    try {
+      // final hasSensor =
+      //     await environmentSensors.getSensorAvailable(SensorType.Humidity);
+      // if (hasSensor) {
+      //   environmentSensors.humidity.listen((hum) {
+      //     setState(() {
+      //       _isSensorAvailable = true;
+      //       _humidity = hum;
+      //     });
+      //   });
+      // }
+    } catch (e) {
       setState(() {
-        _humidity = 60.0; // Simulasi kelembapan
+        _isSensorAvailable = false;
       });
-    });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Humidity:', style: TextStyle(fontWeight: FontWeight.bold)),
-            Text(_humidity != null ? 'Value: $_humidity %' : 'Fetching data...'),
-          ],
-        ),
+      body: Center(
+        child: _isSensorAvailable
+            ? _humidity != null
+                ? Text(
+                    'Humidity: ${_humidity!.toStringAsFixed(2)} °C',
+                    style: const TextStyle(fontSize: 20),
+                  )
+                : const CircularProgressIndicator()
+            : const Text(
+                'Humidity Sensors not supported.',
+                style: TextStyle(fontSize: 18),
+              ),
       ),
     );
   }

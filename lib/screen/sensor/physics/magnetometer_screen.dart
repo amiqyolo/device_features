@@ -1,29 +1,65 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
-class MagnetometerScreen extends StatelessWidget {
+class MagnetometerScreen extends StatefulWidget {
   const MagnetometerScreen({super.key});
+
+  @override
+  State<MagnetometerScreen> createState() => _MagnetometerScreenState();
+}
+
+class _MagnetometerScreenState extends State<MagnetometerScreen> {
+  bool _isMagnetometerAvailable = false;
+  late StreamSubscription<MagnetometerEvent> _subscription;
+  MagnetometerEvent? _magnetometerEvent;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _checkMagnetometer();
+  }
+
+  Future<void> _checkMagnetometer() async {
+    try {
+      _subscription = magnetometerEventStream().listen((event) {
+        setState(() {
+          _isMagnetometerAvailable = true;
+          _magnetometerEvent = event;
+        });
+      });
+    } catch (e) {
+      setState(() {
+        _isMagnetometerAvailable = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Magnetometer Data')),
-      body: StreamBuilder<MagnetometerEvent>(
-        stream: magnetometerEventStream(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) return const CircularProgressIndicator();
-
-          final MagnetometerEvent event = snapshot.data!;
-          return Center(
-            child: Text(
-              'Magnetic Field\nX: ${event.x.toStringAsFixed(2)}\n'
-              'Y: ${event.y.toStringAsFixed(2)}\n'
-              'Z: ${event.z.toStringAsFixed(2)}',
-              style: const TextStyle(fontSize: 20),
-              textAlign: TextAlign.center,
-            ),
-          );
-        },
+      body: Center(
+        child: _isMagnetometerAvailable
+            ? _magnetometerEvent != null
+            ? Text(
+          'X: ${_magnetometerEvent!.x.toStringAsFixed(2)}\n'
+              'Y: ${_magnetometerEvent!.y.toStringAsFixed(2)}\n'
+              'Z: ${_magnetometerEvent!.z.toStringAsFixed(2)}',
+          style: const TextStyle(fontSize: 20),
+          textAlign: TextAlign.center,
+        )
+            : const CircularProgressIndicator()
+            : const Text('Magnetometer not supported by this device.',
+            style: TextStyle(fontSize: 18)),
       ),
     );
   }

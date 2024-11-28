@@ -25,6 +25,13 @@ class _VibrationScreenState extends State<VibrationScreen> {
     });
   }
 
+  Future<void> _testVibration() async {
+    if (_isVibrationSupported) {
+      await Vibration.vibrate(duration: 1000);
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,11 +40,10 @@ class _VibrationScreenState extends State<VibrationScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Text("Vibration Supported: $_isVibrationSupported"),
+            Text("Vibration Supported: ${_isVibrationSupported ? 'Yes' : 'No'}"),
+            const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: _isVibrationSupported
-                  ? () => Vibration.vibrate(duration: 500)
-                  : null,
+              onPressed: _isVibrationSupported ? _testVibration : null,
               child: const Text("Test Vibration"),
             ),
           ],

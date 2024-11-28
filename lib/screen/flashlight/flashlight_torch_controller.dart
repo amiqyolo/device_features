@@ -11,8 +11,31 @@ class FlashlightTorchController extends StatefulWidget {
 
 class _FlashlightTorchControllerState extends State<FlashlightTorchController> {
   bool _isFlashOn = false;
+  bool _isFlashSupported = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _checkFlashSupport();
+  }
+
+  Future<void> _checkFlashSupport() async {
+    try {
+      final isSupported = await TorchLight.isTorchAvailable();
+      setState(() {
+        _isFlashSupported = isSupported;
+      });
+    } catch (e) {
+      setState(() {
+        _isFlashSupported = false;
+      });
+    }
+  }
 
   Future<void> _toggleFlash() async {
+    if (!_isFlashSupported) return;
+
     try {
       if (_isFlashOn) {
         await TorchLight.disableTorch();
@@ -35,11 +58,16 @@ class _FlashlightTorchControllerState extends State<FlashlightTorchController> {
     return Scaffold(
       appBar: AppBar(),
       body: Center(
-        child: IconButton(
-          icon: Icon(_isFlashOn ? Icons.flash_on : Icons.flash_off),
-          iconSize: 64.0,
-          onPressed: _toggleFlash,
-        ),
+        child: _isFlashSupported
+            ? IconButton(
+                icon: Icon(_isFlashOn ? Icons.flash_on : Icons.flash_off),
+                iconSize: 64.0,
+                onPressed: _toggleFlash,
+              )
+            : const Text(
+                "Flashlight not supported on this device",
+                style: TextStyle(fontSize: 18),
+              ),
       ),
     );
   }

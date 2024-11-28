@@ -131,11 +131,11 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
     });
   }
 
-  // @override
-  // void initState() {
-  //   fetchDeviceInfo();
-  //   super.initState();
-  // }
+  @override
+  void initState() {
+    super.initState();
+    // _getStorageInfo();
+  }
 
   @override
   void didChangeDependencies() {

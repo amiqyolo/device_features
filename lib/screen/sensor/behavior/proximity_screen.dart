@@ -15,45 +15,36 @@ class _ProximityScreenState extends State<ProximityScreen> {
   late StreamSubscription<AccelerometerEvent> _accelerometerSubscription;
   AccelerometerEvent? _accelerometerEvent; // sensor plus
 
-  @override
-  void initState() {
-    super.initState();
-
-    _accelerometerSubscription =
-        accelerometerEventStream().listen((AccelerometerEvent event) {
-      if (mounted) {
+  void _startProximitySensor() {
+    accelerometerEventStream().listen((AccelerometerEvent event) {
+      // Contoh pengolahan sederhana untuk mendeteksi proximity
+      if (event.z < 1.0) {
         setState(() {
-          _accelerometerEvent = event;
+          _proximityValue = "Object detected nearby";
+        });
+      } else {
+        setState(() {
+          _proximityValue = "No object nearby";
         });
       }
     });
   }
 
   @override
-  void dispose() {
-    _accelerometerSubscription.cancel(); // Membatalkan stream listener
-    super.dispose();
+  void initState() {
+    super.initState();
+
+    _startProximitySensor();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Proximity (proximity_plugin):',
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            Text('Value: $_proximityValue'),
-            const SizedBox(height: 16.0),
-            const Text('Accelerometer (sensors_plus):',
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            Text(_accelerometerEvent != null
-                ? 'X: ${_accelerometerEvent!.x}, Y: ${_accelerometerEvent!.y}, Z: ${_accelerometerEvent!.z}'
-                : 'Fetching data...'),
-          ],
+      body: Center(
+        child: Text(
+          _proximityValue,
+          style: const TextStyle(fontSize: 20),
         ),
       ),
     );

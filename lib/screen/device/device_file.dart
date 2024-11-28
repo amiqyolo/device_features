@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:system_info2/system_info2.dart';
 
 import '../../utils.dart';
 
@@ -10,6 +11,32 @@ class DeviceFile extends StatefulWidget {
 }
 
 class _DeviceFileState extends State<DeviceFile> {
+  String _storageInfo = "Fetching...";
+
+  @override
+  void initState() {
+    super.initState();
+    _getStorageInfo();
+  }
+
+  Future<void> _getStorageInfo() async {
+    try {
+      final totalSpace = SysInfo.getTotalPhysicalMemory(); // Total capacity
+      final freeSpace = SysInfo.getTotalPhysicalMemory(); // Free space
+
+      setState(() {
+        _storageInfo = """
+Total Internal Storage: ${(totalSpace / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB
+Available Free Space: ${(freeSpace / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB
+        """;
+      });
+    } catch (e) {
+      setState(() {
+        _storageInfo = "Error fetching storage info: $e";
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,6 +107,17 @@ class _DeviceFileState extends State<DeviceFile> {
                       Text('Total RAM: $ramInGB GB'),
                       Text('Free RAM: $ramInGB GB'),
                       Text('Available RAM: $ramInGB GB'),
+                      const SizedBox(height: 20),
+                      Text(
+                        _storageInfo,
+                        style: const TextStyle(fontSize: 18),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _getStorageInfo,
+                        child: const Text("Refresh Storage Info"),
+                      ),
                     ],
                   );
                 },

@@ -11,33 +11,54 @@ class TemperatureScreen extends StatefulWidget {
 }
 
 class _TemperatureScreenState extends State<TemperatureScreen> {
+  // Environment not support
+  // final environmentSensors = EnvironmentSensors();
   double? _temperature;
+  double? _humidity;
+  bool _isSensorAvailable = false;
 
   @override
   void initState() {
     super.initState();
 
-    // Sensors_plus tidak memiliki sensor suhu & kelembapan, simulasi nilai.
-    Future.delayed(const Duration(seconds: 1), () {
+    _checkSensors();
+  }
+
+  Future<void> _checkSensors() async {
+    try {
+      // final hasSensor = await environmentSensors
+      //     .getSensorAvailable(SensorType.AmbientTemperature);
+      // if (hasSensor) {
+      //   environmentSensors.temperature.listen((temp) {
+      //     setState(() {
+      //       _isSensorAvailable = true;
+      //       _temperature = temp;
+      //     });
+      //   });
+      // }
+    } catch (e) {
       setState(() {
-        _temperature = 27.5; // Simulasi suhu
+        _isSensorAvailable = false;
       });
-    });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Temperature:', style: TextStyle(fontWeight: FontWeight.bold)),
-            Text(_temperature != null ? 'Value: $_temperature °C' : 'Fetching data...'),
-          ],
-        ),
+      body: Center(
+        child: _isSensorAvailable
+            ? _temperature != null
+                ? Text(
+                    'Temperature: ${_temperature!.toStringAsFixed(2)} °C',
+                    style: const TextStyle(fontSize: 20),
+                  )
+                : const CircularProgressIndicator()
+            : const Text(
+                'Temperature Sensors not supported.',
+                style: TextStyle(fontSize: 18),
+              ),
       ),
     );
   }

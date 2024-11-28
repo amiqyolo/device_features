@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:sensors_plus/sensors_plus.dart';
+import 'dart:async';
 
-import '../../../widget/feature_button.dart';
+import 'package:flutter/material.dart';
 
 class AmbientLightScreen extends StatefulWidget {
   const AmbientLightScreen({super.key});
@@ -11,18 +10,42 @@ class AmbientLightScreen extends StatefulWidget {
 }
 
 class _AmbientLightScreenState extends State<AmbientLightScreen> {
-  double? _ambientLightValue;
-  UserAccelerometerEvent? _userAccelerometerEvent;
+  String _luxString = 'Unknown';
+
+  // Light not support
+  // Light? _light;
+  StreamSubscription? _subscription;
+  bool _isLightSensorAvailable = false;
+
+  void onData(int luxValue) async {
+    print('Lux Value: $luxValue');
+    setState(() {
+      _isLightSensorAvailable = true;
+      _luxString = '$luxValue';
+    });
+  }
+
+  void stopListening() {
+    _subscription?.cancel();
+  }
+
+  void startListening() {
+    // _light = Light();
+    // try {
+    //   _subscription = _light?.lightSensorStream.listen(onData);
+    // } on LightException catch (e) {
+    //   setState(() {
+    //     _isLightSensorAvailable = false;
+    //   });
+    //   print(e);
+    // }
+  }
 
   @override
   void initState() {
     super.initState();
 
-    userAccelerometerEventStream().listen((event) {
-      setState(() {
-        _userAccelerometerEvent = event;
-      });
-    });
+    startListening();
   }
 
   @override
@@ -31,14 +54,16 @@ class _AmbientLightScreenState extends State<AmbientLightScreen> {
       appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('User Accelerometer (sensors_plus):', style: TextStyle(fontWeight: FontWeight.bold)),
-            Text(_userAccelerometerEvent != null
-                ? 'X: ${_userAccelerometerEvent!.x}, Y: ${_userAccelerometerEvent!.y}, Z: ${_userAccelerometerEvent!.z}'
-                : 'Fetching data...'),
-          ],
+        child: Center(
+          child: _isLightSensorAvailable
+              ? Text(
+                  'Ambient Light: $_luxString lux',
+                  style: const TextStyle(fontSize: 20),
+                )
+              : const Text(
+                  'Ambient Light Sensor not supported on this device.',
+                  style: TextStyle(fontSize: 18),
+                ),
         ),
       ),
     );
