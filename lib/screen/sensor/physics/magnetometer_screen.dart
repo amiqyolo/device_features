@@ -46,20 +46,24 @@ class _MagnetometerScreenState extends State<MagnetometerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Magnetometer Data')),
+      appBar: AppBar(),
       body: Center(
-        child: _isMagnetometerAvailable
-            ? _magnetometerEvent != null
-            ? Text(
-          'X: ${_magnetometerEvent!.x.toStringAsFixed(2)}\n'
-              'Y: ${_magnetometerEvent!.y.toStringAsFixed(2)}\n'
-              'Z: ${_magnetometerEvent!.z.toStringAsFixed(2)}',
-          style: const TextStyle(fontSize: 20),
-          textAlign: TextAlign.center,
-        )
-            : const CircularProgressIndicator()
-            : const Text('Magnetometer not supported by this device.',
-            style: TextStyle(fontSize: 18)),
+        child: Column(
+          children: [
+            Text('Magnetometer supported = $_isMagnetometerAvailable',
+                style: const TextStyle(fontSize: 18)),
+            const SizedBox(height: 16.0),
+            _magnetometerEvent != null
+                ? Text(
+              'X: ${_magnetometerEvent!.x.toStringAsFixed(2)}\n'
+                  'Y: ${_magnetometerEvent!.y.toStringAsFixed(2)}\n'
+                  'Z: ${_magnetometerEvent!.z.toStringAsFixed(2)}',
+              style: const TextStyle(fontSize: 20),
+              textAlign: TextAlign.center,
+            )
+                : const CircularProgressIndicator()
+          ],
+        ),
       ),
     );
   }

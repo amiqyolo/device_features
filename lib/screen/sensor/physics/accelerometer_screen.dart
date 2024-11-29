@@ -23,7 +23,8 @@ class _AccelerometerScreenState extends State<AccelerometerScreen> {
 
   Future<void> checkSensors() async {
     try {
-      _subscription = accelerometerEventStream().listen((AccelerometerEvent event) {
+      _subscription =
+          accelerometerEventStream().listen((AccelerometerEvent event) {
         setState(() {
           _isAccelerometerAvailable = true;
           _accelerometerEvent = event;
@@ -45,24 +46,29 @@ class _AccelerometerScreenState extends State<AccelerometerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Accelerometer Data')),
+      appBar: AppBar(),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: _isAccelerometerAvailable
-            ? _accelerometerEvent != null
-                ? Text(
-                    'X: ${_accelerometerEvent!.x.toStringAsFixed(2)}\n'
-                    'Y: ${_accelerometerEvent!.y.toStringAsFixed(2)}\n'
-                    'Z: ${_accelerometerEvent!.z.toStringAsFixed(2)}',
-                    style: const TextStyle(fontSize: 20),
-                    textAlign: TextAlign.center,
-                  )
-                : const CircularProgressIndicator()
-            : const Text(
-                'Accelerometer not supported by this device.',
-                style: TextStyle(fontSize: 18),
-              ),
-      ),
+          padding: const EdgeInsets.all(16.0),
+          child: Center(
+            child: Column(
+              children: [
+                Text(
+                  'Accelerometer supported = $_isAccelerometerAvailable',
+                  style: const TextStyle(fontSize: 18),
+                ),
+                SizedBox(height: 16.0),
+                _accelerometerEvent != null
+                    ? Text(
+                        'X: ${_accelerometerEvent!.x.toStringAsFixed(2)}\n'
+                        'Y: ${_accelerometerEvent!.y.toStringAsFixed(2)}\n'
+                        'Z: ${_accelerometerEvent!.z.toStringAsFixed(2)}',
+                        style: const TextStyle(fontSize: 20),
+                        textAlign: TextAlign.center,
+                      )
+                    : const CircularProgressIndicator(),
+              ],
+            ),
+          )),
     );
   }
 }

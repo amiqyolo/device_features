@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:device_features/screen/sensor/behavior/sensor_checker.dart';
 import 'package:flutter/material.dart';
 
 class AmbientLightScreen extends StatefulWidget {
@@ -10,42 +11,21 @@ class AmbientLightScreen extends StatefulWidget {
 }
 
 class _AmbientLightScreenState extends State<AmbientLightScreen> {
-  String _luxString = 'Unknown';
-
-  // Light not support
-  // Light? _light;
-  StreamSubscription? _subscription;
+  final SensorChecker _sensorChecker = SensorChecker();
   bool _isLightSensorAvailable = false;
-
-  void onData(int luxValue) async {
-    print('Lux Value: $luxValue');
-    setState(() {
-      _isLightSensorAvailable = true;
-      _luxString = '$luxValue';
-    });
-  }
-
-  void stopListening() {
-    _subscription?.cancel();
-  }
-
-  void startListening() {
-    // _light = Light();
-    // try {
-    //   _subscription = _light?.lightSensorStream.listen(onData);
-    // } on LightException catch (e) {
-    //   setState(() {
-    //     _isLightSensorAvailable = false;
-    //   });
-    //   print(e);
-    // }
-  }
 
   @override
   void initState() {
     super.initState();
 
-    startListening();
+    _checkSensorSupport();
+  }
+
+  Future<void> _checkSensorSupport() async {
+    final sensorSupport = await _sensorChecker.checkSensors();
+    setState(() {
+      _isLightSensorAvailable = sensorSupport["ambientLight"] ?? false;
+    });
   }
 
   @override
@@ -55,15 +35,13 @@ class _AmbientLightScreenState extends State<AmbientLightScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
-          child: _isLightSensorAvailable
-              ? Text(
-                  'Ambient Light: $_luxString lux',
-                  style: const TextStyle(fontSize: 20),
-                )
-              : const Text(
-                  'Ambient Light Sensor not supported on this device.',
-                  style: TextStyle(fontSize: 18),
-                ),
+          child: Text(
+            _isLightSensorAvailable
+                ? "Ambient Light Sensor is Supported\n$_isLightSensorAvailable"
+                : "Ambient Light Sensor is Not Supported\n$_isLightSensorAvailable",
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
         ),
       ),
     );

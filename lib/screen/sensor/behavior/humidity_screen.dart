@@ -1,3 +1,4 @@
+import 'package:device_features/screen/sensor/behavior/sensor_checker.dart';
 import 'package:flutter/material.dart';
 
 class HumidityScreen extends StatefulWidget {
@@ -8,35 +9,20 @@ class HumidityScreen extends StatefulWidget {
 }
 
 class _HumidityScreenState extends State<HumidityScreen> {
-  // Environment not support
-  // final environmentSensors = EnvironmentSensors();
-  double? _humidity;
-  bool _isSensorAvailable = false;
+  final SensorChecker _sensorChecker = SensorChecker();
+  bool _isSupported = false;
 
   @override
   void initState() {
     super.initState();
-
-    _checkSensors();
+    _checkSensorSupport();
   }
 
-  Future<void> _checkSensors() async {
-    try {
-      // final hasSensor =
-      //     await environmentSensors.getSensorAvailable(SensorType.Humidity);
-      // if (hasSensor) {
-      //   environmentSensors.humidity.listen((hum) {
-      //     setState(() {
-      //       _isSensorAvailable = true;
-      //       _humidity = hum;
-      //     });
-      //   });
-      // }
-    } catch (e) {
-      setState(() {
-        _isSensorAvailable = false;
-      });
-    }
+  Future<void> _checkSensorSupport() async {
+    final sensorSupport = await _sensorChecker.checkSensors();
+    setState(() {
+      _isSupported = sensorSupport["humidity"] ?? false;
+    });
   }
 
   @override
@@ -44,17 +30,13 @@ class _HumidityScreenState extends State<HumidityScreen> {
     return Scaffold(
       appBar: AppBar(),
       body: Center(
-        child: _isSensorAvailable
-            ? _humidity != null
-                ? Text(
-                    'Humidity: ${_humidity!.toStringAsFixed(2)} °C',
-                    style: const TextStyle(fontSize: 20),
-                  )
-                : const CircularProgressIndicator()
-            : const Text(
-                'Humidity Sensors not supported.',
-                style: TextStyle(fontSize: 18),
-              ),
+        child: Text(
+          _isSupported
+              ? "Humidity Sensor is Supported\n$_isSupported"
+              : "Humidity Sensor is Not Supported\n$_isSupported",
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }

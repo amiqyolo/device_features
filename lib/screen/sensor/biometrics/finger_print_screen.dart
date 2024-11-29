@@ -10,7 +10,7 @@ class FingerPrintScreen extends StatefulWidget {
 
 class _FingerPrintScreenState extends State<FingerPrintScreen> {
   final LocalAuthentication _auth = LocalAuthentication();
-  bool? _canCheckBiometrics;
+  bool _canCheckBiometrics = false;
   String _authMessage = 'Press the button to authenticate';
 
   @override
@@ -78,29 +78,33 @@ class _FingerPrintScreenState extends State<FingerPrintScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Fingerprint Authentication')),
+      appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            if (_canCheckBiometrics == false)
-              const Text(
-                'Device does not support fingerprint authentication.',
-                style: TextStyle(color: Colors.red),
+        child: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                _canCheckBiometrics
+                    ? 'Device support fingerprint authentication'
+                    : 'Device does not support fingerprint authentication',
+                style: TextStyle(
+                    color: _canCheckBiometrics ? Colors.black : Colors.red),
               ),
-            ElevatedButton(
-              onPressed:
-              _canCheckBiometrics == true ? _authenticate : null,
-              child: const Text('Authenticate with Fingerprint'),
-            ),
-            const SizedBox(height: 16.0),
-            Text(
-              _authMessage,
-              style: const TextStyle(fontSize: 16.0),
-              textAlign: TextAlign.center,
-            ),
-          ],
+              const SizedBox(height: 16.0),
+              ElevatedButton(
+                onPressed: _canCheckBiometrics == true ? _authenticate : null,
+                child: const Text('Authenticate with Fingerprint'),
+              ),
+              const SizedBox(height: 16.0),
+              Text(
+                _authMessage,
+                style: const TextStyle(fontSize: 16.0),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       ),
     );

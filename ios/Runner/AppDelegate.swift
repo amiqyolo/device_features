@@ -11,10 +11,10 @@ import AVFoundation
     GeneratedPluginRegistrant.register(with: self)
 
     let controller = window?.rootViewController as! FlutterViewController
-    let channel = FlutterMethodChannel(name: "com.example.flashlight/channel", binaryMessenger: controller.binaryMessenger)
+    let channel = FlutterMethodChannel(name: "com.aplimelta.flashlight/main", binaryMessenger: controller.binaryMessenger)
 
             channel.setMethodCallHandler { (call, result) in
-                if call.method == "toggleFlashlight" {
+                if call.method == "torch_available" {
                     guard let args = call.arguments as? [String: Any], let status = args["status"] as? Bool else {
                         result(FlutterError(code: "INVALID_ARGUMENTS", message: "Arguments are missing", details: nil))
                         return
@@ -33,6 +33,8 @@ import AVFoundation
                     } catch {
                         result(FlutterError(code: "TORCH_ERROR", message: "Failed to toggle torch", details: error.localizedDescription))
                     }
+                } else if call.method == "checkSensors" {
+                    result(self.checkSensors())
                 } else {
                     result(FlutterMethodNotImplemented)
                 }
@@ -40,4 +42,13 @@ import AVFoundation
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
+
+  private func checkSensors() -> [String: String] {
+          return [
+              "ambientLight": "Not Supported",
+              "proximity": "Not Supported",
+              "temperature": "Not Supported",
+              "humidity": "Not Supported"
+          ]
+      }
 }

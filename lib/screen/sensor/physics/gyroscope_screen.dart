@@ -48,18 +48,22 @@ class _GyroscopeScreenState extends State<GyroscopeScreen> {
     return Scaffold(
       appBar: AppBar(),
       body: Center(
-        child: _isGyroscopeAvailable
-            ? _gyroscopeEvent != null
+        child: Column(
+          children: [
+            Text('Gyroscope supported this device = $_isGyroscopeAvailable',
+                style: const TextStyle(fontSize: 18)),
+            const SizedBox(height: 16.0),
+            _gyroscopeEvent != null
                 ? Text(
-                    'X: ${_gyroscopeEvent!.x.toStringAsFixed(2)}\n'
-                    'Y: ${_gyroscopeEvent!.y.toStringAsFixed(2)}\n'
-                    'Z: ${_gyroscopeEvent!.z.toStringAsFixed(2)}',
-                    style: const TextStyle(fontSize: 20),
-                    textAlign: TextAlign.center,
-                  )
+              'X: ${_gyroscopeEvent!.x.toStringAsFixed(2)}\n'
+                  'Y: ${_gyroscopeEvent!.y.toStringAsFixed(2)}\n'
+                  'Z: ${_gyroscopeEvent!.z.toStringAsFixed(2)}',
+              style: const TextStyle(fontSize: 20),
+              textAlign: TextAlign.center,
+            )
                 : const CircularProgressIndicator()
-            : const Text('Gyroscope not supported by this device.',
-                style: TextStyle(fontSize: 18)),
+          ],
+        )
       ),
     );
   }

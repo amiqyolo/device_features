@@ -45,19 +45,23 @@ class _BarometerScreenState extends State<BarometerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Barometer Data')),
+      appBar: AppBar(),
       body: Center(
-        child: _isBarometerAvailable
-            ? _pressure != null
+        child: Column(
+          children: [
+            Text(
+              'Barometer supported = $_isBarometerAvailable',
+              style: const TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 16.0),
+            _pressure != null
                 ? Text(
                     'Pressure: ${_pressure!.pressure.toStringAsFixed(2)} hPa',
                     style: const TextStyle(fontSize: 20),
                   )
-                : const CircularProgressIndicator()
-            : const Text(
-                'Barometer not supported on this device.',
-                style: TextStyle(fontSize: 18),
-              ),
+                : const CircularProgressIndicator(),
+          ],
+        ),
       ),
     );
   }

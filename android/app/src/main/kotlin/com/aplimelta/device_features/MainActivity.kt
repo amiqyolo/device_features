@@ -1,6 +1,8 @@
 package com.aplimelta.device_features
 
 import android.content.pm.PackageManager
+import android.hardware.Sensor
+import android.hardware.SensorManager
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraManager
 import android.os.Build
@@ -43,9 +45,28 @@ class MainActivity : FlutterFragmentActivity() {
                 NATIVE_EVENT_TORCH_AVAILABLE -> isTorchAvailable(result)
                 NATIVE_EVENT_ENABLE_TORCH -> enableTorch(result)
                 NATIVE_EVENT_DISABLE_TORCH -> disableTorch(result)
+                "checkSensors" -> sensorChecker(result)
                 else -> result.notImplemented()
             }
         }
+    }
+
+    private fun sensorChecker(result: MethodChannel.Result) {
+        val sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        val sensors = sensorManager.getSensorList(Sensor.TYPE_ALL)
+        val sensorMap = mutableMapOf<String, Boolean>()
+
+        sensorMap["ambientLight"] = sensors.any { it.type == Sensor.TYPE_LIGHT }
+        sensorMap["proximity"] = sensors.any { it.type == Sensor.TYPE_PROXIMITY }
+        sensorMap["temperature"] = sensors.any { it.type == Sensor.TYPE_AMBIENT_TEMPERATURE }
+        sensorMap["humidity"] = sensors.any { it.type == Sensor.TYPE_RELATIVE_HUMIDITY }
+
+        Log.d(TAG, "sensorChecker ambientLight: ${sensorMap.values}")
+        Log.d(TAG, "sensorChecker proximity: ${sensorMap.values}")
+        Log.d(TAG, "sensorChecker temperature: ${sensorMap.values}")
+        Log.d(TAG, "sensorChecker humidity: ${sensorMap.values}")
+        
+        result.success(sensorMap)
     }
 
     private fun disableTorch(result: MethodChannel.Result) {
