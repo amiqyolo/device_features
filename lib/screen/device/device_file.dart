@@ -1,5 +1,6 @@
+import 'package:disk_space_2/disk_space_2.dart';
 import 'package:flutter/material.dart';
-import 'package:system_info2/system_info2.dart';
+import 'package:flutter/services.dart';
 
 import '../../utils.dart';
 
@@ -11,30 +12,46 @@ class DeviceFile extends StatefulWidget {
 }
 
 class _DeviceFileState extends State<DeviceFile> {
-  String _storageInfo = "Fetching...";
+  String _platformVersion = 'Unknown';
+  double _totalDiskSpace = 0.0;
+  double _freeDiskSpace = 0.0;
+
+  final _diskSpacePlugin = DiskSpace();
 
   @override
   void initState() {
     super.initState();
-    _getStorageInfo();
+    _initPlatformState();
   }
 
-  Future<void> _getStorageInfo() async {
-    try {
-      final totalSpace = SysInfo.getTotalPhysicalMemory(); // Total capacity
-      final freeSpace = SysInfo.getTotalPhysicalMemory(); // Free space
+  Future<void> _initPlatformState() async {
+    String platformVersion;
+    double totalDiskSpace;
+    double freeDiskSpace;
+    // double freeDiskSpaceForPath;
 
-      setState(() {
-        _storageInfo = """
-Total Internal Storage: ${(totalSpace / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB
-Available Free Space: ${(freeSpace / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB
-        """;
-      });
-    } catch (e) {
-      setState(() {
-        _storageInfo = "Error fetching storage info: $e";
-      });
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    // We also handle the message potentially returning null.
+    try {
+      platformVersion = await _diskSpacePlugin.getPlatformVersion() ??
+          'Unknown platform version';
+    } on PlatformException {
+      platformVersion = 'Failed to get platform version.';
     }
+
+    totalDiskSpace = await DiskSpace.getTotalDiskSpace ?? 0.0;
+    freeDiskSpace = await DiskSpace.getFreeDiskSpace ?? 0.0;
+
+    if (!mounted) return;
+
+    setState(() {
+      _platformVersion = platformVersion;
+      _totalDiskSpace = totalDiskSpace;
+      _freeDiskSpace = freeDiskSpace;
+      print(_totalDiskSpace / 1024);
+      print(_freeDiskSpace / 1024);
+      print(_freeDiskSpace / 1000);
+    });
   }
 
   @override
@@ -74,11 +91,14 @@ Available Free Space: ${(freeSpace / (1024 * 1024 * 1024)).toStringAsFixed(2)} G
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(coreName, style: TextStyle(fontWeight: FontWeight.bold)),
+                          Text(coreName,
+                              style: TextStyle(fontWeight: FontWeight.bold)),
                           ...coreDetails.map((details) {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: details.entries.map((e) => Text('${e.key}: ${e.value}')).toList(),
+                              children: details.entries
+                                  .map((e) => Text('${e.key}: ${e.value}'))
+                                  .toList(),
                             );
                           }),
                           SizedBox(height: 16),
@@ -98,26 +118,21 @@ Available Free Space: ${(freeSpace / (1024 * 1024 * 1024)).toStringAsFixed(2)} G
                   if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   }
-        
+
                   final totalRAM = snapshot.data ?? 0;
-                  final ramInGB = (totalRAM / (1024 * 1024 * 1024)).toStringAsFixed(2);
-        
+                  final ramInGB =
+                      (totalRAM / (1024 * 1024 * 1024)).toStringAsFixed(2);
+
                   return Column(
                     children: [
                       Text('Total RAM: $ramInGB GB'),
                       Text('Free RAM: $ramInGB GB'),
                       Text('Available RAM: $ramInGB GB'),
                       const SizedBox(height: 20),
-                      Text(
-                        _storageInfo,
-                        style: const TextStyle(fontSize: 18),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _getStorageInfo,
-                        child: const Text("Refresh Storage Info"),
-                      ),
+                      Text('Running on: $_platformVersion'),
+                      Text('Total disk space: ${(_totalDiskSpace / 1000).toStringAsFixed(2)} GB'),
+                      Text('Free disk space: ${(_freeDiskSpace / 1024).toStringAsFixed(2)} GB'),
+                      Text('Free disk space: ${(_freeDiskSpace / 1000).toStringAsFixed(2)} GB'),
                     ],
                   );
                 },

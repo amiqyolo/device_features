@@ -47,6 +47,7 @@ dependencies:
   volume_controller: ^2.0.8
   vibration: ^2.0.1
   connectivity_plus: ^6.1.0
+  disk_space_2: ^1.0.8
 
 dev_dependencies:
   flutter_test:
