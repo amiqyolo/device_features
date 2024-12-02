@@ -60,6 +60,7 @@ class MainActivity : FlutterFragmentActivity() {
         sensorMap["proximity"] = sensors.any { it.type == Sensor.TYPE_PROXIMITY }
         sensorMap["temperature"] = sensors.any { it.type == Sensor.TYPE_AMBIENT_TEMPERATURE }
         sensorMap["humidity"] = sensors.any { it.type == Sensor.TYPE_RELATIVE_HUMIDITY }
+        sensorMap["humidity"] = sensors.any { it.type == Sensor.TYPE_PRESSURE }
 
         Log.d(TAG, "sensorChecker ambientLight: ${sensorMap.values}")
         Log.d(TAG, "sensorChecker proximity: ${sensorMap.values}")

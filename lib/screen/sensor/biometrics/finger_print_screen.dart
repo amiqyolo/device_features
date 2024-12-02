@@ -24,13 +24,23 @@ class _FingerPrintScreenState extends State<FingerPrintScreen> {
     try {
       final canCheck = await _auth.canCheckBiometrics;
       final isDeviceSupported = await _auth.isDeviceSupported();
+      final List<BiometricType> availableBiometrics = await _auth.getAvailableBiometrics();
 
-      debugPrint('canCheckBiometrics: $canCheck'); // true
+      debugPrint("Available biometrics: $availableBiometrics");
+
+      if (availableBiometrics.contains(BiometricType.fingerprint)) {
+        debugPrint("Fingerprint is available!");
+      } else {
+        debugPrint("Fingerprint is not available!");
+      }
+
+      debugPrint('canCheckBiometrics: $canCheck');
       debugPrint('isDeviceSupported: $isDeviceSupported');
       logDeviceInfo();
 
       setState(() {
-        _canCheckBiometrics = canCheck && isDeviceSupported;
+        // _canCheckBiometrics = canCheck && isDeviceSupported;
+        _canCheckBiometrics = canCheck;
       });
     } catch (e) {
       debugPrint('Error: $e');
@@ -54,14 +64,13 @@ class _FingerPrintScreenState extends State<FingerPrintScreen> {
         ),
       );
 
-      debugPrint('Authentication Result: $authenticated');
       setState(() {
         _authMessage = authenticated
             ? 'Authentication Successful'
             : 'Authentication Failed';
       });
     } catch (e) {
-      debugPrint('Authentication Error: $e');
+      debugPrint('Error: $e');
       setState(() {
         _authMessage = 'Authentication Error: $e';
       });
@@ -74,7 +83,7 @@ class _FingerPrintScreenState extends State<FingerPrintScreen> {
 
     debugPrint('Device: ${androidInfo.model}');
     debugPrint('Android Version: ${androidInfo.version.sdkInt}');
-    debugPrint('Fingerprint Support: $_canCheckBiometrics'); // true
+    debugPrint('Fingerprint Support: $_canCheckBiometrics');
   }
 
   @override
