@@ -1,5 +1,8 @@
+import 'package:local_auth/error_codes.dart' as auth_error;
+
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 
 class FingerPrintScreen extends StatefulWidget {
@@ -24,11 +27,13 @@ class _FingerPrintScreenState extends State<FingerPrintScreen> {
     try {
       final canCheck = await _auth.canCheckBiometrics;
       final isDeviceSupported = await _auth.isDeviceSupported();
-      final List<BiometricType> availableBiometrics = await _auth.getAvailableBiometrics();
+      final List<BiometricType> availableBiometrics =
+          await _auth.getAvailableBiometrics();
 
       debugPrint("Available biometrics: $availableBiometrics");
 
-      if (availableBiometrics.contains(BiometricType.fingerprint)) {
+      if (availableBiometrics.contains(BiometricType.fingerprint) ||
+          availableBiometrics.contains(BiometricType.strong)) {
         debugPrint("Fingerprint is available!");
       } else {
         debugPrint("Fingerprint is not available!");
@@ -40,7 +45,12 @@ class _FingerPrintScreenState extends State<FingerPrintScreen> {
 
       setState(() {
         // _canCheckBiometrics = canCheck && isDeviceSupported;
-        _canCheckBiometrics = canCheck;
+        if (availableBiometrics.contains(BiometricType.strong) ||
+            availableBiometrics.contains(BiometricType.fingerprint)) {
+          _canCheckBiometrics = true;
+        } else {
+          _canCheckBiometrics = canCheck;
+        }
       });
     } catch (e) {
       debugPrint('Error: $e');
@@ -69,11 +79,29 @@ class _FingerPrintScreenState extends State<FingerPrintScreen> {
             ? 'Authentication Successful'
             : 'Authentication Failed';
       });
-    } catch (e) {
-      debugPrint('Error: $e');
-      setState(() {
-        _authMessage = 'Authentication Error: $e';
-      });
+    } on PlatformException catch (e) {
+      if (e.code == auth_error.notAvailable) {
+        // Handle not available error
+        debugPrint('Error A: $e');
+        setState(() {
+          _authMessage = 'Pastikan anda mengatur fingerprint terlebih dahulu';
+        });
+      } else if (e.code == auth_error.passcodeNotSet) {
+        // Handle passcode not set error
+        debugPrint('Error B: $e');
+        setState(() {
+          _authMessage = 'Pastikan anda mengatur passcode terlebih dahulu';
+        });
+      } else if (e.code == auth_error.notEnrolled) {
+        // Handle not enrolled error
+        debugPrint('Error C: $e');
+      } else if (e.code == auth_error.lockedOut) {
+        // Handle locked out error
+        debugPrint('Error D: $e');
+      } else {
+        // Handle other errors
+        debugPrint('Error E: $e');
+      }
     }
   }
 
