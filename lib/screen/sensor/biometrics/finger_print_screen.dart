@@ -1,3 +1,4 @@
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
 
@@ -24,10 +25,15 @@ class _FingerPrintScreenState extends State<FingerPrintScreen> {
       final canCheck = await _auth.canCheckBiometrics;
       final isDeviceSupported = await _auth.isDeviceSupported();
 
+      debugPrint('canCheckBiometrics: $canCheck'); // true
+      debugPrint('isDeviceSupported: $isDeviceSupported');
+      logDeviceInfo();
+
       setState(() {
         _canCheckBiometrics = canCheck && isDeviceSupported;
       });
     } catch (e) {
+      debugPrint('Error: $e');
       setState(() {
         _authMessage = 'Error checking biometric support: $e';
       });
@@ -48,31 +54,27 @@ class _FingerPrintScreenState extends State<FingerPrintScreen> {
         ),
       );
 
+      debugPrint('Authentication Result: $authenticated');
       setState(() {
         _authMessage = authenticated
             ? 'Authentication Successful'
             : 'Authentication Failed';
       });
     } catch (e) {
+      debugPrint('Authentication Error: $e');
       setState(() {
         _authMessage = 'Authentication Error: $e';
       });
     }
   }
 
-  Future<void> authenticateWithFingerprint() async {
-    try {
-      final isAuthenticated = await _auth.authenticate(
-          localizedReason: 'Authenticate to access secure features');
-      final message = isAuthenticated
-          ? "Authentication Successful"
-          : "Authentication Failed";
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(message)));
-    } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Error: $e")));
-    }
+  Future<void> logDeviceInfo() async {
+    final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    final androidInfo = await deviceInfo.androidInfo;
+
+    debugPrint('Device: ${androidInfo.model}');
+    debugPrint('Android Version: ${androidInfo.version.sdkInt}');
+    debugPrint('Fingerprint Support: $_canCheckBiometrics'); // true
   }
 
   @override
