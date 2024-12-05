@@ -18,6 +18,7 @@ class _DeviceFileState extends State<DeviceFile> {
   double _freeDiskSpace = 0.0;
   String _model = "Unknown";
   String _brand = "Unknown";
+  String _manufacture = "Unknown";
 
   final _diskSpacePlugin = DiskSpace();
 
@@ -129,6 +130,7 @@ class _DeviceFileState extends State<DeviceFile> {
 
                   return Column(
                     children: [
+                      Text('Manufacture: $_manufacture'),
                       Text('Brand: $_brand'),
                       Text('Model: $_model'),
                       Text('Total RAM: $ramInGB GB'),
@@ -154,17 +156,20 @@ class _DeviceFileState extends State<DeviceFile> {
     DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
     String model;
     String brand;
+    String manufacture;
 
     try {
       final AndroidDeviceInfo androidDeviceInfo =
       await deviceInfoPlugin.androidInfo;
 
       model = androidDeviceInfo.model;
-      brand = androidDeviceInfo.manufacturer;
+      brand = androidDeviceInfo.brand;
+      manufacture = androidDeviceInfo.manufacturer;
 
     } on PlatformException {
       model = "";
       brand = "";
+      manufacture = "";
     }
 
     if (!mounted) return;
@@ -172,6 +177,7 @@ class _DeviceFileState extends State<DeviceFile> {
     setState(() {
       _model = model;
       _brand = brand;
+      _manufacture = manufacture;
     });
   }
 }
