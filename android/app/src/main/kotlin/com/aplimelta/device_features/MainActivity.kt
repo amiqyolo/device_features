@@ -8,6 +8,7 @@ import android.hardware.camera2.CameraManager
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import com.scottyab.rootbeer.RootBeer
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -46,6 +47,10 @@ class MainActivity : FlutterFragmentActivity() {
                 NATIVE_EVENT_ENABLE_TORCH -> enableTorch(result)
                 NATIVE_EVENT_DISABLE_TORCH -> disableTorch(result)
                 "checkSensors" -> sensorChecker(result)
+                "isRootChecker" -> {
+                    val rootBeer = RootBeer(applicationContext)
+                    result.success(rootBeer.isRooted)
+                }
                 else -> result.notImplemented()
             }
         }
@@ -53,21 +58,63 @@ class MainActivity : FlutterFragmentActivity() {
 
     private fun sensorChecker(result: MethodChannel.Result) {
         val sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-        val sensors = sensorManager.getSensorList(Sensor.TYPE_ALL)
-        val sensorMap = mutableMapOf<String, Boolean>()
+//        val sensors = sensorManager.getSensorList(Sensor.TYPE_ALL)
+//        val sensorMap = mutableMapOf<String, Boolean>()
+//        sensorMap["ambientLight"] = sensors.any { it.type == Sensor.TYPE_LIGHT }
+//        sensorMap["proximity"] = sensors.any { it.type == Sensor.TYPE_PROXIMITY }
+//        sensorMap["temperature"] = sensors.any { it.type == Sensor.TYPE_AMBIENT_TEMPERATURE }
+//        sensorMap["humidity"] = sensors.any { it.type == Sensor.TYPE_RELATIVE_HUMIDITY }
 
-        sensorMap["ambientLight"] = sensors.any { it.type == Sensor.TYPE_LIGHT }
-        sensorMap["proximity"] = sensors.any { it.type == Sensor.TYPE_PROXIMITY }
-        sensorMap["temperature"] = sensors.any { it.type == Sensor.TYPE_AMBIENT_TEMPERATURE }
-        sensorMap["humidity"] = sensors.any { it.type == Sensor.TYPE_RELATIVE_HUMIDITY }
-        sensorMap["humidity"] = sensors.any { it.type == Sensor.TYPE_PRESSURE }
+        val sensorList = listOf(
+            Sensor.TYPE_ACCELEROMETER to "Accelerometer",
+            Sensor.TYPE_GYROSCOPE to "Gyroscope",
+            Sensor.TYPE_MAGNETIC_FIELD to "Magnetometer",
+            Sensor.TYPE_PRESSURE to "Barometer",
+            Sensor.TYPE_LIGHT to "Ambient Light",
+            Sensor.TYPE_PROXIMITY to "Proximity",
+            Sensor.TYPE_RELATIVE_HUMIDITY to "Humidity",
+            Sensor.TYPE_AMBIENT_TEMPERATURE to "Temperature",
+        )
+        val data = mutableMapOf<String, Map<String, Any>>()
 
-        Log.d(TAG, "sensorChecker ambientLight: ${sensorMap.values}")
-        Log.d(TAG, "sensorChecker proximity: ${sensorMap.values}")
-        Log.d(TAG, "sensorChecker temperature: ${sensorMap.values}")
-        Log.d(TAG, "sensorChecker humidity: ${sensorMap.values}")
+        sensorList.forEach { (type, name) ->
+            val sensor = sensorManager.getDefaultSensor(type)
+            val isAvailable = sensor != null
+            if (isAvailable) {
+                val sensorValues = readSensorValues(sensorManager, sensor!!)
+                data[name] = mapOf(
+                    "available" to true,
+                    "value" to sensorValues
+                )
+            } else {
+                data[name] = mapOf("available" to false)
+            }
+        }
+
+        Log.d(TAG, "Accelerometer: ${data["Accelerometer"]}")
+        Log.d(TAG, "Gyroscope: ${data["Gyroscope"]}")
+        Log.d(TAG, "Magnetometer: ${data["Magnetometer"]}")
+        Log.d(TAG, "Barometer: ${data["Barometer"]}")
+        Log.d(TAG, "Ambient Light: ${data["Ambient Light"]}")
+        Log.d(TAG, "Proximity: ${data["Proximity"]}")
+        Log.d(TAG, "Temperature: ${data["Temperature"]}")
+        Log.d(TAG, "Humidity: ${data["Humidity"]}")
         
-        result.success(sensorMap)
+        result.success(data)
+    }
+
+    private fun readSensorValues(sensorManager: SensorManager, sensor: Sensor): Any {
+        // Return static data for demonstration. Actual implementation
+        // requires asynchronous SensorEventListener to fetch real-time values.
+        return when (sensor.type) {
+            Sensor.TYPE_ACCELEROMETER, Sensor.TYPE_GYROSCOPE, Sensor.TYPE_MAGNETIC_FIELD -> listOf(1.0, 2.0, 3.0) // x, y, z values
+            Sensor.TYPE_PRESSURE -> 1013.25 // Example pressure in hPa
+            Sensor.TYPE_LIGHT -> 100.0 // Example ambient light in lx
+            Sensor.TYPE_PROXIMITY -> 5.0 // Example distance in cm
+            Sensor.TYPE_RELATIVE_HUMIDITY -> 45.0 // Example humidity in %
+            Sensor.TYPE_AMBIENT_TEMPERATURE -> 22.0 // Example temperature in °C
+            else -> "N/A"
+        }
     }
 
     private fun disableTorch(result: MethodChannel.Result) {

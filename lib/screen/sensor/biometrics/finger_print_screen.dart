@@ -80,28 +80,29 @@ class _FingerPrintScreenState extends State<FingerPrintScreen> {
             : 'Authentication Failed';
       });
     } on PlatformException catch (e) {
-      if (e.code == auth_error.notAvailable) {
-        // Handle not available error
-        debugPrint('Error A: $e');
-        setState(() {
-          _authMessage = 'Pastikan anda mengatur fingerprint terlebih dahulu';
-        });
-      } else if (e.code == auth_error.passcodeNotSet) {
-        // Handle passcode not set error
-        debugPrint('Error B: $e');
-        setState(() {
-          _authMessage = 'Pastikan anda mengatur passcode terlebih dahulu';
-        });
-      } else if (e.code == auth_error.notEnrolled) {
-        // Handle not enrolled error
-        debugPrint('Error C: $e');
-      } else if (e.code == auth_error.lockedOut) {
-        // Handle locked out error
-        debugPrint('Error D: $e');
-      } else {
-        // Handle other errors
-        debugPrint('Error E: $e');
-      }
+      setState(() {
+        if (e.code == auth_error.notAvailable) {
+          // Handle not available error
+          debugPrint('Error A: $e');
+            _authMessage = 'Pastikan anda mengaktifkan kunci';
+        } else if (e.code == auth_error.passcodeNotSet) {
+          // Handle passcode not set error
+          debugPrint('Error B: $e');
+            _authMessage = '${e.message}';
+        } else if (e.code == auth_error.notEnrolled) {
+          // Handle not enrolled error
+          debugPrint('Error C: $e');
+            _authMessage = '${e.message}';
+        } else if (e.code == auth_error.lockedOut) {
+          // Handle locked out error
+          debugPrint('Error D: $e');
+          _authMessage = '${e.message}';
+        } else {
+          // Handle other errors
+          debugPrint('Error E: $e');
+          _authMessage = '${e.message}';
+        }
+      });
     }
   }
 

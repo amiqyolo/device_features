@@ -38,6 +38,10 @@ android {
             signingConfig = signingConfigs.debug
         }
     }
+
+    dependencies {
+        implementation 'com.scottyab:rootbeer-lib:0.1.1'
+    }
 }
 
 flutter {

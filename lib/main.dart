@@ -3,6 +3,7 @@ import 'package:device_features/screen/device/device_file.dart';
 import 'package:device_features/screen/device/device_info_screen.dart';
 import 'package:device_features/screen/flashlight/flashlight_screen.dart';
 import 'package:device_features/screen/flashlight/flashlight_torch_controller.dart';
+import 'package:device_features/screen/rooted/android_root_screen.dart';
 import 'package:device_features/screen/sensor/sensor_screen.dart';
 import 'package:device_features/screen/touchscreen/touch_screen.dart';
 import 'package:device_features/screen/touchscreen/touch_tracker_screen.dart';
@@ -123,6 +124,13 @@ class MyHomePage extends StatelessWidget {
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const WifiConnectivityScreen()),
+                ),
+              ),
+              FeatureButton(
+                label: 'Access Android Rooted',
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AndroidRootScreen()),
                 ),
               ),
             ],

@@ -1,3 +1,4 @@
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:disk_space_2/disk_space_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +16,8 @@ class _DeviceFileState extends State<DeviceFile> {
   String _platformVersion = 'Unknown';
   double _totalDiskSpace = 0.0;
   double _freeDiskSpace = 0.0;
+  String _model = "Unknown";
+  String _brand = "Unknown";
 
   final _diskSpacePlugin = DiskSpace();
 
@@ -22,6 +25,7 @@ class _DeviceFileState extends State<DeviceFile> {
   void initState() {
     super.initState();
     _initPlatformState();
+    _initDeviceInfo();
   }
 
   Future<void> _initPlatformState() async {
@@ -125,6 +129,8 @@ class _DeviceFileState extends State<DeviceFile> {
 
                   return Column(
                     children: [
+                      Text('Brand: $_brand'),
+                      Text('Model: $_model'),
                       Text('Total RAM: $ramInGB GB'),
                       Text('Free RAM: $ramInGB GB'),
                       Text('Available RAM: $ramInGB GB'),
@@ -142,5 +148,30 @@ class _DeviceFileState extends State<DeviceFile> {
         ),
       ),
     );
+  }
+
+  Future<void> _initDeviceInfo() async {
+    DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+    String model;
+    String brand;
+
+    try {
+      final AndroidDeviceInfo androidDeviceInfo =
+      await deviceInfoPlugin.androidInfo;
+
+      model = androidDeviceInfo.model;
+      brand = androidDeviceInfo.manufacturer;
+
+    } on PlatformException {
+      model = "";
+      brand = "";
+    }
+
+    if (!mounted) return;
+
+    setState(() {
+      _model = model;
+      _brand = brand;
+    });
   }
 }
